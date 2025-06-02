@@ -1,0 +1,14 @@
+Test Content for Course Pipeline
+
+This is a test file to verify that the course content compiler pipeline is working correctly.
+
+Learning Objectives:
+- Test the extraction pipeline
+- Verify the aggregation process
+- Ensure proper error handling
+
+Example:
+This is an example of instructional content that should be processed by the pipeline.
+
+Summary:
+The pipeline should be able to process this content and generate appropriate outputs.

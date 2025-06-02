@@ -1,7 +1,7 @@
 import json
 import os
 from typing import List, Dict
-from content_schema import ContentItem
+from course_compiler.content_schema import ContentItem
 import re
 from difflib import get_close_matches
 
@@ -11,10 +11,36 @@ def load_content_items(json_paths: List[str]) -> List[ContentItem]:
     for path in json_paths:
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
+
+            # Extract segments from the actual data structure
+            segments = []
+            if isinstance(data, dict):
+                # Handle instructional JSON structure
+                if 'sections' in data:
+                    for section in data['sections']:
+                        for component in section.get('components', []):
+                            if component.get('text'):
+                                segments.append({
+                                    'id': f"{data.get('file_name', 'unknown')}_{len(segments)}",
+                                    'text': component['text'],
+                                    'topics': component.get('tags', [])[:3],  # Use first 3 tags as topics
+                                    'summary': component['text'][:100] + '...' if len(component['text']) > 100 else component['text']
+                                })
+                elif isinstance(data, list):
+                    # Handle list of segments
+                    for i, item in enumerate(data):
+                        if isinstance(item, dict) and item.get('text'):
+                            segments.append({
+                                'id': f"segment_{i}",
+                                'text': item['text'],
+                                'topics': item.get('tags', [])[:3],
+                                'summary': item['text'][:100] + '...' if len(item['text']) > 100 else item['text']
+                            })
+
             items.append(ContentItem(
-                source=data['source'],
-                media_type=data['media_type'],
-                segments=data['segments']
+                source=os.path.basename(path),
+                media_type='instructional',
+                segments=segments
             ))
     return items
 

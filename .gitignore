@@ -1,3 +1,4 @@
 # in .gitignore
 .DS_Store
 __pycache__/
+output/

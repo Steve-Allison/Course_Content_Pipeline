@@ -1,10 +1,8 @@
-
-
 import os
 import glob
-from topic_map_builder import load_content_items, build_topic_map, save_topic_map
+from course_compiler.topic_map_builder import load_content_items, build_topic_map, save_topic_map
+from course_compiler.config import OUTPUT_ROOT
 
-OUTPUT_ROOT = "output"
 STRUCTURED_CONTENT_GLOB = os.path.join(OUTPUT_ROOT, "*.json")
 TOPIC_MAP_PATH = os.path.join(OUTPUT_ROOT, "topic_map.json")
 

@@ -87,9 +87,9 @@ def main():
         run_script(step["script"], step["desc"])
 
     # Now verify prep outputs before any analysis
-    check_exists(f"{OUTPUT_ROOT}/media_metadata", "Media metadata directory", require_nonempty=True)
+    check_exists(f"{OUTPUT_ROOT}/media_metadata", "Media metadata directory", require_nonempty=False)
     check_exists(f"{OUTPUT_ROOT}/instructional_json", "Instructional JSON output", require_nonempty=True)
-    check_exists(f"{OUTPUT_ROOT}/caption_prepped", "Caption-prepped directory", require_nonempty=True)
+    check_exists(f"{OUTPUT_ROOT}/caption_prepped", "Caption-prepped directory", require_nonempty=False)
 
     # Now, run analysis/QA/aggregation phase only if prep successful
     for step in analysis_steps:

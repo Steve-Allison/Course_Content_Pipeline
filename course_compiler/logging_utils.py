@@ -1,2 +1,14 @@
-from course_compiler.logging_utils import setup_logger
-logger = setup_logger(__name__)
+import logging
+
+def setup_logger(name):
+    """
+    Set up and return a logger with the given name.
+    """
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
+    return logger

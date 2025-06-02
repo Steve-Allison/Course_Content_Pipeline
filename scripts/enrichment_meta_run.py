@@ -1,15 +1,15 @@
 from course_compiler.config import OUTPUT_ROOT
-+from course_compiler.enrichment_meta import (
-+    group_segments_by_topic,
-+    print_tag_coverage,
-+    top_entities,
-+    print_concepts_missing_examples,
-+    visual_asset_report,
-+    find_tagged_caption_segments,
-+    assessments_by_topic,
-+    export_instructional_review,
-+    export_needs_assessment,
-+)
+from course_compiler.enrichment_meta import (
+    group_segments_by_topic,
+    print_tag_coverage,
+    top_entities,
+    print_concepts_missing_examples,
+    visual_asset_report,
+    find_tagged_caption_segments,
+    assessments_by_topic,
+    export_instructional_review,
+    export_needs_assessment,
+)
 from course_compiler.file_utils import sanitize_filename
 import os
 import sys
