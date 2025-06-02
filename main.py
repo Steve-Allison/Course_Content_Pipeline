@@ -72,7 +72,10 @@ def main():
             {"path": f"{OUTPUT_ROOT}/topics_summary.json", "desc": "Topics summary JSON", "require_nonempty": False}
         ]},
         {"script": SCRIPTS_DIR / "enrichment_meta_run.py", "desc": "Meta-analysis and Prompt/QA File Generation", "outputs": []},
-        {"script": SCRIPTS_DIR / "run_build_glossary.py", "desc": "Build Glossary for Definitions (SME/LLM)", "outputs": []}
+        {"script": SCRIPTS_DIR / "run_build_glossary.py", "desc": "Build Glossary for Definitions (SME/LLM)", "outputs": []},
+        {"script": SCRIPTS_DIR / "run_build_topic_map.py", "desc": "Build Fuzzy Topic Map", "outputs": [
+            {"path": f"{OUTPUT_ROOT}/topic_map.json", "desc": "Fuzzy Topic Map JSON", "require_nonempty": False}
+        ]}
     ]
 
     start_time = datetime.datetime.now()

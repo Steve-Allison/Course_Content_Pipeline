@@ -3,7 +3,7 @@ You can copy-paste this as your project’s `README.md`.
 
 ---
 
-# Course\_content\_compiler
+# Course_content_compiler
 
 > **Modular, Mac-Optimized Python Pipeline for Instructional and Multimodal Content Analysis**
 
@@ -88,7 +88,7 @@ Course_content_compiler/
 From the project root:
 
 ```sh
-python main.py
+python main.py --max_workers 4
 ```
 
 * This will:
@@ -122,6 +122,48 @@ python main.py
 
 ---
 
+## **Advanced Analysis Features**
+
+This pipeline also includes intelligent analysis layers that go beyond metadata extraction:
+
+- **Segment Quality Checks**  
+  Flags segments that are too short or missing summary/tags.
+
+- **Topic Coverage & Frequency**  
+  Reports how thoroughly topics are represented and which segments lack tagging.
+
+- **Glossary Coverage & Usage**  
+  Tracks which glossary terms are used, unused, and suggests terms for removal or improvement.
+
+- **Duplicate Segment Detection**  
+  Uses semantic similarity (Sentence Transformers) to find and log highly similar segment pairs.
+
+- **AI Prompt Templates for Glossary Review**  
+  Generates ready-to-use prompt files to feed AI tools for improving glossary definitions or examples.
+
+- **Project Output Manifest**  
+  A top-level JSON that indexes all output artifacts for use in dashboards or LLM agents.
+
+  ```json
+  {
+    "glossary": {
+      "terms_path": "...",
+      "usage_path": "...",
+      ...
+    },
+    "topics": { ... },
+    "segments": { ... }
+  }
+  ```
+
+- **Parallel Enrichment with Thread Pooling**  
+  Accelerates segment processing using `--max_workers` to distribute tasks across threads.
+
+- **Function-Level Disk Caching**  
+  Avoids redundant processing by caching results of enrichment functions like summarization and glossary extraction.
+
+---
+
 ## **Pipeline Scripts**
 
 **(Do not run these manually unless debugging—`main.py` orchestrates everything)**
@@ -134,6 +176,21 @@ python main.py
 
 * `scripts/run_aggregate_metadata.py`
   → Aggregates all outputs, runs entity extraction and topic modeling (logs to `/output/`)
+
+* `scripts/analyze_segment_sources.py`  
+  → Counts segments by content source (`caption`, `instructional`, etc.)
+
+* `scripts/analyze_segment_quality_and_topics.py`  
+  → Reports segment issues and topic tagging coverage
+
+* `scripts/analyze_glossary_usage.py`  
+  → Tracks glossary term usage and generates improvement prompts
+
+* `scripts/generate_output_manifest.py`  
+  → Indexes all pipeline outputs into a single manifest
+
+* `scripts/detect_duplicates.py`  
+  → Finds semantically similar (duplicate) segments across content
 
 ---
 
@@ -175,6 +232,8 @@ pymupdf
 python-docx
 python-pptx
 ```
+
+* To enable caching, ensure `joblib` is installed.
 
 ---
 

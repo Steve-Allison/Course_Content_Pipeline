@@ -1,45 +1,34 @@
-import logging
+import whisper
 from pathlib import Path
-import os
-
 from course_compiler.config import INPUT_ROOT, OUTPUT_ROOT
-from course_compiler.file_utils import ensure_dirs, sanitize_filename
-from course_compiler.vtt_srt_prep import get_vtt_srt_stems
-from course_compiler.extractor import transcribe_file
+from course_compiler.file_utils import sanitize_filename
 
 def transcribe_all_media():
-    input_root = Path(INPUT_ROOT) / "media"
+    model = whisper.load_model("large")  # or "medium", "large", "base"
+    input_root = Path(INPUT_ROOT)
     out_dir = Path(OUTPUT_ROOT) / "transcripts"
-    ensure_dirs(OUTPUT_ROOT, ["transcripts"])
+    out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Gather stems for which VTT/SRT captions already exist
-    vtt_srt_dir = Path(INPUT_ROOT) / "captions"
-    vtt_srt_stems = get_vtt_srt_stems(vtt_srt_dir)
+    # Gather all VTT and SRT stems in the input folder
+    vtt_srt_stems = {p.stem for p in input_root.glob("*.vtt")}
+    vtt_srt_stems.update({p.stem for p in input_root.glob("*.srt")})
 
-    for media in input_root.iterdir():
-        # Only process common media extensions
-        if media.suffix.lower() not in [".mp4", ".mov", ".mp3", ".wav"]:
-            continue
-
-        # Skip if a matching caption file exists
-        if media.stem in vtt_srt_stems:
-            print(f"Skipping {media.name} – captions already provided")
-            continue
-
-        safe_stem = sanitize_filename(media.stem)
-        transcript_path = out_dir / (safe_stem + ".txt")
-        if transcript_path.exists():
-            print(f"Transcript already exists for {media.name}")
-            continue
-
-        try:
-            print(f"Transcribing {media.name}...")
-            transcription_text = transcribe_file(str(media))
+    for media in input_root.glob("*"):
+        if media.suffix.lower() in [".mp4", ".mov", ".mp3", ".wav"]:
+            if media.stem in vtt_srt_stems:
+                print(f"SKIPPING {media.name} (found matching caption file)")
+                continue
+            # Sanitize output filename
+            safe_stem = sanitize_filename(media.stem)
+            transcript_path = out_dir / (safe_stem + ".txt")
+            if transcript_path.exists():
+                print(f"Transcript already exists for {media.name}")
+                continue
+            print(f"Transcribing {media.name} ...")
+            result = model.transcribe(str(media))
             with open(transcript_path, "w") as f:
-                f.write(transcription_text)
-            print(f"Wrote transcript for {media.name} → {transcript_path.name}")
-        except Exception as e:
-            print(f"Error transcribing {media.name}: {e}")
+                f.write(result["text"])
+            print(f"Wrote transcript: {transcript_path}")
 
 if __name__ == "__main__":
     transcribe_all_media()
