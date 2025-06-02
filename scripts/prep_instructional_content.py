@@ -2,7 +2,7 @@ import logging
 import datetime
 from pathlib import Path
 from course_compiler.config import INPUT_ROOT, OUTPUT_ROOT
-from course_compiler.file_utils import sanitize_filename
+from course_compiler.file_utils import sanitize_filename, ensure_dirs
 from course_compiler.extractor import (
     extract_pptx_hierarchical, extract_docx_hierarchical, extract_pdf_hierarchical, save_instructional_json
 )

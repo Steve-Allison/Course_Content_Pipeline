@@ -2,7 +2,7 @@ import logging
 import datetime
 from pathlib import Path
 from course_compiler.config import INPUT_ROOT, OUTPUT_ROOT
-from course_compiler.file_utils import sanitize_filename
+from course_compiler.file_utils import sanitize_filename, ensure_dirs
 from course_compiler.vtt_srt_prep import (
     parse_vtt_segments, parse_srt_segments,
     clean_caption_text, semantic_process_segments, save_caption_segments
@@ -21,7 +21,7 @@ logging.basicConfig(
 def main():
     input_root = Path(INPUT_ROOT)
     out_dir = Path(OUTPUT_ROOT) / "caption_prepped"
-    out_dir.mkdir(parents=True, exist_ok=True)
+    ensure_dirs(OUTPUT_ROOT, ["caption_prepped"])
 
     vtt_files = list(input_root.rglob("*.vtt"))
     srt_files = list(input_root.rglob("*.srt"))

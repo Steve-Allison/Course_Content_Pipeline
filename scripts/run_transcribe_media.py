@@ -1,13 +1,13 @@
 import whisper
 from pathlib import Path
 from course_compiler.config import INPUT_ROOT, OUTPUT_ROOT
-from course_compiler.file_utils import sanitize_filename
+from course_compiler.file_utils import sanitize_filename, ensure_dirs
 
 def transcribe_all_media():
     model = whisper.load_model("large")  # or "medium", "large", "base"
     input_root = Path(INPUT_ROOT)
     out_dir = Path(OUTPUT_ROOT) / "transcripts"
-    out_dir.mkdir(parents=True, exist_ok=True)
+    ensure_dirs(OUTPUT_ROOT, ["transcripts"])
 
     # Gather all VTT and SRT stems in the input folder
     vtt_srt_stems = {p.stem for p in input_root.glob("*.vtt")}

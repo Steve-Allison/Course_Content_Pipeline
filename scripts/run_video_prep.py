@@ -3,6 +3,7 @@ import datetime
 from pathlib import Path
 from course_compiler.config import INPUT_ROOT, OUTPUT_ROOT
 from course_compiler.video_prep import batch_video_processing
+from course_compiler.file_utils import ensure_dirs
 
 Path(OUTPUT_ROOT).mkdir(parents=True, exist_ok=True)
 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -19,6 +20,7 @@ logging.basicConfig(
 def main():
     video_input_folder = INPUT_ROOT
     video_output_folder = f"{OUTPUT_ROOT}/video_prepped"
+    ensure_dirs(OUTPUT_ROOT, ["video_prepped"])
     log_file = Path(OUTPUT_ROOT) / f"video_prep_batch_{timestamp}.log"
     log_file = Path(str(log_file).replace(" ", "_"))
 
@@ -28,7 +30,7 @@ def main():
         video_output_folder,
         log_path=log_file,
         process_iframe=True,
-        process_audio=True,
+        process_audio=False,  # Only do audio in audio prep!
         process_frames=False,      # Set to True to enable frame extraction
         frame_interval=30,         # Frames extracted every 30 frames if enabled
         skip_existing=True
