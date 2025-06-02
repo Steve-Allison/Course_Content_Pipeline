@@ -4,7 +4,7 @@ from pathlib import Path
 from course_compiler.config import OUTPUT_ROOT
 from course_compiler.file_utils import sanitize_filename
 from course_compiler.summarisation import (
-    load_json_records,
+    flatten_instructional_json,
     deduplicate_glossary,
     write_summary_jsonl,
     write_summary_csv,
@@ -36,7 +36,19 @@ def main():
         logging.warning("No extracted instructional JSON files found.")
         return
 
-    extracted_data = load_json_records(extracted_files)
+    # Flatten all instructional JSONs
+    extracted_data = []
+    for file in extracted_files:
+        with open(file, "r") as f:
+            content = f.read()
+            try:
+                import json
+                content = json.loads(content)
+            except Exception as e:
+                print(f"Error loading {file}: {e}")
+                continue
+        flat = flatten_instructional_json(content, source_file=file.name)
+        extracted_data.extend(flat)
     print(f"Loaded {len(extracted_data)} extracted data records.")
 
     # Write JSONL and CSV summaries

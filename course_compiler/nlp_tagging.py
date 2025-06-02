@@ -19,7 +19,23 @@ INSTRUCTIONAL_LABELS = [
     "concept",
     "feedback",
     "introduction",
-    "conclusion"
+    "conclusion",
+    # Expanded types
+    "definition",
+    "reference",
+    "warning",
+    "tip",
+    "note",
+    "activity",
+    "exercise",
+    "case study",
+    "video",
+    "image",
+    "table",
+    "chart",
+    "slide",
+    "page",
+    "section",
 ]
 
 nlp = spacy.load("en_core_web_sm")
@@ -27,11 +43,12 @@ nlp = spacy.load("en_core_web_sm")
 def rule_based_tags(text):
     tags = []
     txt_lower = text.lower()
+    # Instructional roles
     if re.search(r"\b(objective|goal|outcome)\b", txt_lower):
         tags.append("learning_objective")
     if txt_lower.endswith("?") or txt_lower.startswith("why") or txt_lower.startswith("how"):
         tags.append("question")
-    if re.search(r"\bexample\b|\be\.g\.", txt_lower):
+    if re.search(r"\bexample\b|\be\.g\.\b", txt_lower):
         tags.append("example")
     if "summary" in txt_lower or "recap" in txt_lower:
         tags.append("summary")
@@ -43,6 +60,40 @@ def rule_based_tags(text):
         tags.append("introduction")
     if "conclusion" in txt_lower or "thank you" in txt_lower or "summary" in txt_lower:
         tags.append("conclusion")
+    # Expanded instructional types
+    if re.search(r"\bfeedback\b|well done|good job|review", txt_lower):
+        tags.append("feedback")
+    if re.search(r"\bdefinition\b|is defined as|means", txt_lower):
+        tags.append("definition")
+    if re.search(r"\btip:|pro tip|hint", txt_lower):
+        tags.append("tip")
+    if re.search(r"\bnote:|important:|remember", txt_lower):
+        tags.append("note")
+    if re.search(r"\bactivity\b|try this|exercise|practice", txt_lower):
+        tags.append("activity")
+    if re.search(r"\bexercise\b|practice question|drill", txt_lower):
+        tags.append("exercise")
+    if re.search(r"case study|real-world example", txt_lower):
+        tags.append("case_study")
+    if re.search(r"\bvideo\b|watch|play video|see video", txt_lower):
+        tags.append("video")
+    if re.search(r"\bimage\b|see image|figure|diagram|illustration", txt_lower):
+        tags.append("image")
+    if re.search(r"\btable\b|see table|tabular", txt_lower):
+        tags.append("table")
+    if re.search(r"\bchart\b|graph|plot|visualization", txt_lower):
+        tags.append("chart")
+    if re.search(r"\bwarning\b|caution|be careful", txt_lower):
+        tags.append("warning")
+    if re.search(r"\breference\b|see also|related", txt_lower):
+        tags.append("reference")
+    # Structural tags (for context or explicit mention)
+    if re.search(r"\bslide\b", txt_lower):
+        tags.append("slide")
+    if re.search(r"\bpage\b", txt_lower):
+        tags.append("page")
+    if re.search(r"\bsection\b|part|chapter", txt_lower):
+        tags.append("section")
     return list(set(tags))
 
 def spacy_based_tags(text):

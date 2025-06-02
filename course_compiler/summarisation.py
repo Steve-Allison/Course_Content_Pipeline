@@ -90,3 +90,19 @@ def write_markdown_glossary(glossary_data, output_md_path):
             for ctx in item['sample_contexts']:
                 f.write(f"  - {ctx.strip()}\n")
             f.write("\n")
+
+def flatten_instructional_json(data, source_file=None):
+    flat = []
+    if isinstance(data, dict):
+        # If this dict represents a slide/page/section/component, capture it
+        if any(k in data for k in ["slide_number", "page_number", "section", "heading", "text", "components"]):
+            item = dict(data)
+            if source_file:
+                item["source_file"] = source_file
+            flat.append(item)
+        for v in data.values():
+            flat.extend(flatten_instructional_json(v, source_file=source_file))
+    elif isinstance(data, list):
+        for v in data:
+            flat.extend(flatten_instructional_json(v, source_file=source_file))
+    return flat
