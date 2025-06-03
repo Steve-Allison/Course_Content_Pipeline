@@ -8,6 +8,14 @@
 
 This pipeline processes corporate learning and instructional content in bulk—including PowerPoint, Word, PDF, audio, video, and captions (VTT/SRT)—to generate rich, structured, and AI-ready datasets.
 
+## Supported File Types
+
+- Microsoft Excel (.xlsx, .xlsm, .xltx, .xls)
+- Microsoft PowerPoint (.pptx, .ppt)
+- Microsoft Word (.docx, .doc)
+- PDF (.pdf)
+- Text files (.txt, .md, .rst, .csv, .json, .xml, .html)
+
 - **Extracts instructional hierarchy, images, tables, charts, and speaker notes from docs**
 - **Performs robust semantic analysis and tagging using NLP/LLMs**
 - **Processes and aligns captions (VTT/SRT) with full instructional tagging**

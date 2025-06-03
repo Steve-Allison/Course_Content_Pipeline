@@ -1,0 +1,39 @@
+# Core Dependencies
+python-dotenv>=1.0.0
+python-pptx>=0.6.21
+python-docx>=0.8.11
+PyMuPDF>=1.21.0
+Pillow>=9.0.0
+camelot-py[base]>=0.10.1
+chardet>=5.0.0
+openpyxl>=3.0.10  # For Excel file support
+
+# File type detection (requires libmagic installed via Homebrew on macOS)
+python-magic>=0.4.27
+
+# NLP and Processing
+spacy>=3.4.0
+nltk>=3.7
+scikit-learn>=1.0.2
+
+# Utilities
+tqdm>=4.64.0
+python-dateutil>=2.8.2
+
+# Testing
+pytest>=7.1.2
+pytest-cov>=3.0.0
+
+# Development
+black>=22.3.0
+isort>=5.10.1
+mypy>=0.961
+flake8>=4.0.1
+pre-commit>=2.20.0
+
+# Documentation
+sphinx>=5.0.0
+sphinx-rtd-theme>=1.0.0
+
+# Note: On macOS, install libmagic via Homebrew: brew install libmagic
+# On Linux: sudo apt-get install libmagic1
