@@ -2,3 +2,22 @@
 .DS_Store
 __pycache__/
 output/
+
+# Legacy files (for future cleanup)
+course_compiler/legacy/
+
+# IDE files
+.vscode/launch.json
+.idea/
+
+# Python virtual environments
+venv/
+env/
+.env
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak

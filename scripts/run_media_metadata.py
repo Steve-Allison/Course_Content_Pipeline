@@ -21,14 +21,14 @@ def main():
             continue
         for media_file in media_dir.rglob("*.*"):
             found_files = True
-            try:
-                meta = ffprobe_metadata(str(media_file))
-                out_file = output_dir / f"{media_file.stem}_metadata.json"
-                with open(out_file, "w") as f:
-                    json.dump(meta, f, indent=2)
-                print(f"Wrote metadata for {media_file.name} → {out_file.name}")
-            except Exception as e:
-                print(f"Failed to extract metadata for {media_file}: {e}")
+        try:
+            meta = ffprobe_metadata(str(media_file))
+            out_file = output_dir / f"{media_file.stem}_metadata.json"
+            with open(out_file, "w") as f:
+                json.dump(meta, f, indent=2)
+            print(f"Wrote metadata for {media_file.name} → {out_file.name}")
+        except Exception as e:
+            print(f"Failed to extract metadata for {media_file}: {e}")
     if not found_files:
         print("No prepped media files found in audio_prepped or video_prepped.")
 

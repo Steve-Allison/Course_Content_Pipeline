@@ -78,11 +78,21 @@ def main():
         ]}
     ]
 
+    # Phase 3: COMPREHENSIVE ANALYSIS
+    comprehensive_analysis_steps = [
+        {"script": SCRIPTS_DIR / "run_comprehensive_analysis.py", "desc": "Comprehensive Content Analysis Suite", "outputs": [
+            {"path": f"{OUTPUT_ROOT}/segment_counts_by_source.json", "desc": "Source distribution analysis", "require_nonempty": False},
+            {"path": f"{OUTPUT_ROOT}/segment_quality_report.json", "desc": "Content quality report", "require_nonempty": False},
+            {"path": f"{OUTPUT_ROOT}/duplicate_segments.json", "desc": "Duplicate content detection", "require_nonempty": False}
+        ]}
+    ]
+
     start_time = datetime.datetime.now()
     print(f"\n=== Course_content_compiler Pipeline START: {start_time:%Y-%m-%d %H:%M:%S} ===")
     logging.info(f"Pipeline started at {start_time:%Y-%m-%d %H:%M:%S}")
 
     # Run all prep steps first, regardless of interim outputs
+    print(f"\n🔧 === PHASE 1: CONTENT PREPARATION ===")
     for step in prep_steps:
         run_script(step["script"], step["desc"])
 
@@ -92,15 +102,24 @@ def main():
     check_exists(f"{OUTPUT_ROOT}/caption_prepped", "Caption-prepped directory", require_nonempty=False)
 
     # Now, run analysis/QA/aggregation phase only if prep successful
+    print(f"\n📊 === PHASE 2: CORE ANALYSIS & ENRICHMENT ===")
     for step in analysis_steps:
+        run_script(step["script"], step["desc"])
+        for output in step.get("outputs", []):
+            check_exists(output["path"], output["desc"], output.get("require_nonempty", False))
+
+    # Finally, run comprehensive analysis suite
+    print(f"\n🔍 === PHASE 3: COMPREHENSIVE ANALYSIS ===")
+    for step in comprehensive_analysis_steps:
         run_script(step["script"], step["desc"])
         for output in step.get("outputs", []):
             check_exists(output["path"], output["desc"], output.get("require_nonempty", False))
 
     end_time = datetime.datetime.now()
     duration = (end_time - start_time).total_seconds()
-    print(f"\n=== Pipeline COMPLETE! ({duration:.1f} seconds) ===")
-    print(f"Check logs at: {logfile}")
+    print(f"\n🎉 === PIPELINE COMPLETE! ({duration:.1f} seconds) ===")
+    print(f"📋 Check detailed logs at: {logfile}")
+    print(f"📁 All outputs available in: {OUTPUT_ROOT}")
     logging.info(f"Pipeline completed at {end_time:%Y-%m-%d %H:%M:%S} (duration: {duration:.1f} seconds)")
 
 if __name__ == "__main__":

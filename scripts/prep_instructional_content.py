@@ -3,9 +3,8 @@ import datetime
 from pathlib import Path
 from course_compiler.config import INPUT_ROOT, OUTPUT_ROOT
 from course_compiler.file_utils import sanitize_filename, ensure_dirs
-from course_compiler.extractor import (
-    extract_pptx_hierarchical, extract_docx_hierarchical, extract_pdf_hierarchical, save_instructional_json
-)
+from course_compiler.extractors import extract_content
+import json
 
 # Ensure output directory exists before logging!
 Path(OUTPUT_ROOT).mkdir(parents=True, exist_ok=True)
@@ -17,33 +16,55 @@ logging.basicConfig(
     level=logging.INFO
 )
 
+def save_extraction_results(data, output_dir, output_filename):
+    """Save extracted content as JSON with proper filename sanitization."""
+    output_path = Path(output_dir) / output_filename
+    with open(output_path, "w") as f:
+        json.dump(data, f, indent=2, default=str)
+    return output_path
+
 def main():
     ensure_dirs(OUTPUT_ROOT, ["instructional_json"])
     input_root = Path(INPUT_ROOT)
     out_dir = Path(OUTPUT_ROOT) / "instructional_json"
 
+    # Create images subdirectory
+    images_dir = out_dir / "images"
+    images_dir.mkdir(parents=True, exist_ok=True)
+
     all_files = list(input_root.rglob("*"))
+    supported_extensions = {'.pptx', '.ppt', '.docx', '.doc', '.pdf', '.xlsx', '.xlsm', '.xltx', '.xls', '.txt', '.md'}
+
+    processed_count = 0
+
     for file in all_files:
+        if not file.is_file() or file.suffix.lower() not in supported_extensions:
+            continue
+
         try:
             # Determine output filename (always sanitized)
             safe_filename = sanitize_filename(file.stem) + ".json"
             output_path = out_dir / safe_filename
 
-            if file.suffix.lower() == ".pptx":
-                data = extract_pptx_hierarchical(file, out_dir)
-                save_instructional_json(data, out_dir, output_filename=safe_filename)
-                logging.info(f"SUCCESS: Processed PPTX {file} -> {output_path}")
-            elif file.suffix.lower() == ".docx":
-                data = extract_docx_hierarchical(file)
-                save_instructional_json(data, out_dir, output_filename=safe_filename)
-                logging.info(f"SUCCESS: Processed DOCX {file} -> {output_path}")
-            elif file.suffix.lower() == ".pdf":
-                data = extract_pdf_hierarchical(file, out_dir)
-                save_instructional_json(data, out_dir, output_filename=safe_filename)
-                logging.info(f"SUCCESS: Processed PDF {file} -> {output_path}")
+            # Configure extraction with images directory
+            config = {
+                'images_dir': str(images_dir)
+            }
+
+            # Use the new extractors package
+            data = extract_content(file, config)
+
+            # Save the results
+            save_extraction_results(data, out_dir, safe_filename)
+
+            logging.info(f"SUCCESS: Processed {file.suffix.upper()} {file} -> {output_path}")
+            processed_count += 1
+
         except Exception as e:
             logging.error(f"ERROR processing file {file}: {e}", exc_info=True)
-    logging.info(f"Instructional extraction complete. Output directory: {out_dir}")
+
+    logging.info(f"Instructional extraction complete. Processed {processed_count} files. Output directory: {out_dir}")
+    print(f"Processed {processed_count} instructional files. Check {logfile} for details.")
 
 if __name__ == "__main__":
     main()

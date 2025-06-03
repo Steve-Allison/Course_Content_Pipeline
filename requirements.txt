@@ -15,6 +15,14 @@ python-magic>=0.4.27
 spacy>=3.4.0
 nltk>=3.7
 scikit-learn>=1.0.2
+sentence-transformers>=2.0.0  # For duplicate detection
+transformers>=4.0.0  # For NLP tagging
+bertopic>=0.15.0  # For topic modeling
+
+# Audio/Video Processing (optional)
+# openai-whisper>=20230314  # Optional: for transcription (large download)
+webvtt-py>=0.4.6  # For VTT caption processing
+srt>=3.5.0  # For SRT caption processing
 
 # Utilities
 tqdm>=4.64.0
@@ -37,3 +45,7 @@ sphinx-rtd-theme>=1.0.0
 
 # Note: On macOS, install libmagic via Homebrew: brew install libmagic
 # On Linux: sudo apt-get install libmagic1
+
+# Optional Transcription Setup:
+# For audio transcription capabilities, install: pip install openai-whisper
+# This will download ~1-5GB of model files on first use
