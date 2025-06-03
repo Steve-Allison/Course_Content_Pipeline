@@ -1,6 +1,6 @@
-// Python 3.10.17 in course_pipeline environment
+// Python 3.11.8 in course_pipeline environment (conda)
 {
-  "python.defaultInterpreterPath": "/Users/steveallison/.pyenv/versions/course_pipeline/bin/python",
+  "python.defaultInterpreterPath": "/Users/steveallison/miniconda3/envs/course_pipeline/bin/python",
   "python.linting.enabled": true,
   "python.linting.flake8Enabled": true,
   "python.linting.pylintEnabled": false,
