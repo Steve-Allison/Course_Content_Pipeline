@@ -1,18 +1,18 @@
 import json
 from pathlib import Path
-from course_compiler.config import OUTPUT_ROOT
+from course_compiler.config import MEDIA_METADATA_DIR, AUDIO_PREPPED_DIR, VIDEO_PREPPED_DIR
 from course_compiler.metadata import ffprobe_metadata
 from course_compiler.file_utils import ensure_dirs
 
 def main():
     # Prepare output directory
-    output_dir = Path(OUTPUT_ROOT) / "media_metadata"
-    ensure_dirs(OUTPUT_ROOT, ["media_metadata"])
+    output_dir = Path(MEDIA_METADATA_DIR)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     # Directories to scan for prepped media
     prepped_dirs = [
-        Path(OUTPUT_ROOT) / "audio_prepped",
-        Path(OUTPUT_ROOT) / "video_prepped"
+        Path(AUDIO_PREPPED_DIR),
+        Path(VIDEO_PREPPED_DIR)
     ]
 
     found_files = False

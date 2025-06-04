@@ -4,10 +4,15 @@ import logging
 import datetime
 from pathlib import Path
 import os
-from course_compiler.config import OUTPUT_ROOT
+from course_compiler.config import (
+    OUTPUT_ROOT, LOGS_DIR, PROCESSED_DIR, SUMMARY_DIR,
+    INSTRUCTIONAL_JSON_DIR, CAPTION_PREPPED_DIR, MEDIA_METADATA_DIR,
+    ANALYSIS_DIR
+)
 
 Path(OUTPUT_ROOT).mkdir(parents=True, exist_ok=True)
-logfile = Path(OUTPUT_ROOT) / f"pipeline_main_{datetime.datetime.now():%Y%m%d_%H%M%S}.log"
+Path(LOGS_DIR).mkdir(parents=True, exist_ok=True)
+logfile = Path(LOGS_DIR) / f"pipeline_main_{datetime.datetime.now():%Y%m%d_%H%M%S}.log"
 logging.basicConfig(
     filename=logfile,
     filemode="a",
@@ -68,22 +73,22 @@ def main():
     analysis_steps = [
         {"script": SCRIPTS_DIR / "summarisation_run.py", "desc": "Glossary & Coverage Summarisation", "outputs": []},
         {"script": SCRIPTS_DIR / "run_aggregate_metadata.py", "desc": "Aggregate and Enrich Outputs", "outputs": [
-            {"path": f"{OUTPUT_ROOT}/entities_summary.json", "desc": "Entities summary JSON", "require_nonempty": False},
-            {"path": f"{OUTPUT_ROOT}/topics_summary.json", "desc": "Topics summary JSON", "require_nonempty": False}
+            {"path": f"{SUMMARY_DIR}/entities_summary.json", "desc": "Entities summary JSON", "require_nonempty": False},
+            {"path": f"{SUMMARY_DIR}/topics_summary.json", "desc": "Topics summary JSON", "require_nonempty": False}
         ]},
         {"script": SCRIPTS_DIR / "enrichment_meta_run.py", "desc": "Meta-analysis and Prompt/QA File Generation", "outputs": []},
         {"script": SCRIPTS_DIR / "run_build_glossary.py", "desc": "Build Glossary for Definitions (SME/LLM)", "outputs": []},
         {"script": SCRIPTS_DIR / "run_build_topic_map.py", "desc": "Build Fuzzy Topic Map", "outputs": [
-            {"path": f"{OUTPUT_ROOT}/topic_map.json", "desc": "Fuzzy Topic Map JSON", "require_nonempty": False}
+            {"path": f"{ANALYSIS_DIR}/topic_map.json", "desc": "Fuzzy Topic Map JSON", "require_nonempty": False}
         ]}
     ]
 
     # Phase 3: COMPREHENSIVE ANALYSIS
     comprehensive_analysis_steps = [
         {"script": SCRIPTS_DIR / "run_comprehensive_analysis.py", "desc": "Comprehensive Content Analysis Suite", "outputs": [
-            {"path": f"{OUTPUT_ROOT}/segment_counts_by_source.json", "desc": "Source distribution analysis", "require_nonempty": False},
-            {"path": f"{OUTPUT_ROOT}/segment_quality_report.json", "desc": "Content quality report", "require_nonempty": False},
-            {"path": f"{OUTPUT_ROOT}/duplicate_segments.json", "desc": "Duplicate content detection", "require_nonempty": False}
+            {"path": f"{ANALYSIS_DIR}/segment_counts_by_source.json", "desc": "Source distribution analysis", "require_nonempty": False},
+            {"path": f"{ANALYSIS_DIR}/segment_quality_report.json", "desc": "Content quality report", "require_nonempty": False},
+            {"path": f"{ANALYSIS_DIR}/duplicate_segments.json", "desc": "Duplicate content detection", "require_nonempty": False}
         ]}
     ]
 
@@ -97,9 +102,9 @@ def main():
         run_script(step["script"], step["desc"])
 
     # Now verify prep outputs before any analysis
-    check_exists(f"{OUTPUT_ROOT}/media_metadata", "Media metadata directory", require_nonempty=False)
-    check_exists(f"{OUTPUT_ROOT}/instructional_json", "Instructional JSON output", require_nonempty=True)
-    check_exists(f"{OUTPUT_ROOT}/caption_prepped", "Caption-prepped directory", require_nonempty=False)
+    check_exists(MEDIA_METADATA_DIR, "Media metadata directory", require_nonempty=False)
+    check_exists(INSTRUCTIONAL_JSON_DIR, "Instructional JSON output", require_nonempty=True)
+    check_exists(CAPTION_PREPPED_DIR, "Caption-prepped directory", require_nonempty=False)
 
     # Now, run analysis/QA/aggregation phase only if prep successful
     print(f"\n📊 === PHASE 2: CORE ANALYSIS & ENRICHMENT ===")
@@ -120,6 +125,7 @@ def main():
     print(f"\n🎉 === PIPELINE COMPLETE! ({duration:.1f} seconds) ===")
     print(f"📋 Check detailed logs at: {logfile}")
     print(f"📁 All outputs available in: {OUTPUT_ROOT}")
+    print(f"🎯 AI-ready files in: {SUMMARY_DIR}")
     logging.info(f"Pipeline completed at {end_time:%Y-%m-%d %H:%M:%S} (duration: {duration:.1f} seconds)")
 
 if __name__ == "__main__":

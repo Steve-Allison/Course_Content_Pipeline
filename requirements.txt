@@ -19,8 +19,90 @@ sentence-transformers>=2.0.0  # For duplicate detection
 transformers>=4.0.0  # For NLP tagging
 bertopic>=0.15.0  # For topic modeling
 
-# Audio/Video Processing (optional)
-# openai-whisper>=20230314  # Optional: for transcription (large download)
+# 🎵 ADVANCED AUDIO PROCESSING LIBRARIES
+# Core audio processing
+librosa>=0.10.0  # Advanced audio analysis, spectral features, tempo/beat tracking
+soundfile>=0.12.0  # Audio I/O for librosa
+resampy>=0.4.0  # High-quality audio resampling
+
+# PyTorch ecosystem for audio (optional but powerful)
+torch>=2.0.0  # Core PyTorch for neural audio processing
+torchaudio>=2.0.0  # PyTorch audio processing, models, and transforms
+
+# Audio manipulation and processing
+pydub>=0.25.0  # Audio manipulation, format conversion, effects
+ffmpeg-python>=0.2.0  # Python bindings for FFmpeg
+
+# Enhanced transcription
+openai-whisper>=20230314  # Enhanced speech-to-text with word-level timing
+
+# Audio analysis support libraries
+scipy>=1.9.0  # Scientific computing for signal processing
+numpy>=1.21.0  # Numerical computing foundation
+matplotlib>=3.5.0  # Plotting for audio visualizations (optional)
+pandas>=1.5.0  # Data analysis and manipulation
+
+# Additional audio utilities
+webrtcvad>=2.0.10  # Voice activity detection
+speechrecognition>=3.10.0  # Additional speech recognition capabilities
+pyaudio>=0.2.11  # Audio I/O (may require system dependencies)
+
+# 🔍 VISUAL CONTENT ANALYSIS LIBRARIES
+# Computer vision and OCR
+opencv-python>=4.8.0  # Computer vision for image analysis
+pytesseract>=0.3.10  # OCR text extraction from images
+Pillow>=9.0.0  # Enhanced image processing (already included above)
+pillow-simd>=9.0.0  # Optional: SIMD-optimized Pillow for better performance
+
+# AI vision models
+transformers>=4.21.0  # AI models for image captioning and analysis (already included above)
+torch>=2.0.0  # PyTorch for AI models (already included above)
+torchvision>=0.15.0  # Computer vision models and transforms
+
+# 🧠 KNOWLEDGE GRAPH & RELATIONSHIP MAPPING
+# Graph processing and analysis
+networkx>=3.0  # Graph creation, analysis, and algorithms
+igraph>=0.10.0  # Alternative graph library for complex analysis
+graph-tool>=2.45  # High-performance graph analysis (optional, complex install)
+
+# Semantic similarity and embeddings
+sentence-transformers>=2.2.0  # Semantic embeddings (already included above)
+umap-learn>=0.5.0  # Dimensionality reduction for embeddings
+hdbscan>=0.8.0  # Clustering for concept grouping
+
+# Graph visualization
+plotly>=5.0.0  # Interactive graph visualization
+pyvis>=0.3.0  # Network visualization in web browsers
+bokeh>=3.0.0  # Interactive visualization platform
+
+# 📊 ENHANCED DATA ANALYSIS & PROCESSING
+# Advanced NLP and ML
+keybert>=0.7.0  # Keyword extraction using BERT
+yake>=0.4.8  # Yet Another Keyword Extractor
+textstat>=0.7.0  # Text readability and complexity metrics
+readability>=0.3.1  # Additional readability measures
+
+# Mathematical and formula processing
+sympy>=1.11.0  # Symbolic mathematics
+latex2mathml>=3.76.0  # LaTeX to MathML conversion
+mathpix-python>=0.1.1  # Math formula recognition (requires API key)
+
+# Time series and sequence analysis
+tslearn>=0.6.0  # Time series analysis for sequential content
+dtaidistance>=2.3.0  # Dynamic time warping for sequence similarity
+
+# 🎨 VISUALIZATION & REPORTING
+# Enhanced plotting and visualization
+seaborn>=0.12.0  # Statistical data visualization
+wordcloud>=1.9.0  # Word cloud generation
+graphviz>=0.20.0  # Graph visualization (requires system graphviz)
+
+# Report generation
+reportlab>=4.0.0  # PDF generation
+jinja2>=3.1.0  # Template engine for reports
+markdown>=3.5.0  # Markdown processing
+
+# Audio/Video Processing (legacy - keeping for compatibility)
 webvtt-py>=0.4.6  # For VTT caption processing
 srt>=3.5.0  # For SRT caption processing
 
@@ -43,9 +125,19 @@ pre-commit>=2.20.0
 sphinx>=5.0.0
 sphinx-rtd-theme>=1.0.0
 
-# Note: On macOS, install libmagic via Homebrew: brew install libmagic
-# On Linux: sudo apt-get install libmagic1
+# Note: On macOS, install dependencies via Homebrew:
+# brew install libmagic ffmpeg portaudio graphviz tesseract
+# On Linux: sudo apt-get install libmagic1 ffmpeg portaudio19-dev graphviz tesseract-ocr
 
-# Optional Transcription Setup:
-# For audio transcription capabilities, install: pip install openai-whisper
-# This will download ~1-5GB of model files on first use
+# 🎯 ENHANCED KNOWLEDGE EXTRACTION CAPABILITIES:
+# ✅ Visual Intelligence: OCR, AI image captioning, chart analysis, object detection
+# ✅ Knowledge Graphs: Semantic relationship mapping, concept clustering, learning paths
+# ✅ Advanced NLP: Entity relationships, hierarchical concept extraction, co-occurrence analysis
+# ✅ Multi-modal Fusion: Combining insights from text, audio, visual, and structural content
+# ✅ Semantic Search: Embeddings for concept similarity and cross-content connections
+# ✅ Interactive Visualization: Web-based graph exploration and knowledge discovery
+# ✅ Formula & Math Processing: Extract and analyze mathematical content
+# ✅ Readability Analysis: Content complexity and accessibility assessment
+# ✅ Sequence Analysis: Temporal and structural pattern recognition
+# ✅ Enhanced Reporting: Rich PDF and interactive report generation
+# ✅ Community Detection: Automatic clustering of related concepts and content

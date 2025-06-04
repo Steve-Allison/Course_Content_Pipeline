@@ -1,7 +1,7 @@
 import logging
 import datetime
 from pathlib import Path
-from course_compiler.config import OUTPUT_ROOT
+from course_compiler.config import INSTRUCTIONAL_JSON_DIR, SUMMARY_DIR, LOGS_DIR
 from course_compiler.file_utils import sanitize_filename
 from course_compiler.summarisation import (
     flatten_instructional_json,
@@ -12,8 +12,8 @@ from course_compiler.summarisation import (
 )
 
 # Ensure output dir exists before logging
-Path(OUTPUT_ROOT).mkdir(parents=True, exist_ok=True)
-logfile = Path(OUTPUT_ROOT) / f"summarisation_run_{datetime.datetime.now():%Y%m%d_%H%M%S}.log"
+Path(LOGS_DIR).mkdir(parents=True, exist_ok=True)
+logfile = Path(LOGS_DIR) / f"summarisation_run_{datetime.datetime.now():%Y%m%d_%H%M%S}.log"
 logging.basicConfig(
     filename=logfile,
     filemode="a",
@@ -25,8 +25,8 @@ def main():
     print("=== Summarisation/Glossary batch run ===")
     logging.info("Starting summarisation batch run...")
 
-    extracted_dir = Path(OUTPUT_ROOT) / "instructional_json"
-    summary_dir = Path(OUTPUT_ROOT) / "summary"
+    extracted_dir = Path(INSTRUCTIONAL_JSON_DIR)
+    summary_dir = Path(SUMMARY_DIR)
     summary_dir.mkdir(parents=True, exist_ok=True)
 
     # Gather all extracted JSONs
@@ -56,28 +56,20 @@ def main():
     summary_csv = summary_dir / "instructional_summary.csv"
     write_summary_jsonl(extracted_data, summary_jsonl)
     write_summary_csv(extracted_data, summary_csv)
-    logging.info(f"Saved instructional summary to {summary_jsonl} and {summary_csv}")
+    print(f"Written summary files: {summary_jsonl} and {summary_csv}")
 
-    # Deduplicate glossary and export
-    glossary = deduplicate_glossary(extracted_data)
-    glossary_json = summary_dir / "summary_glossary.json"
-    glossary_md = summary_dir / "summary_glossary.md"
-    with open(glossary_json, "w") as f:
-        import json
-        json.dump(glossary, f, indent=2)
-    write_markdown_glossary(glossary, glossary_md)
-    print(f"Wrote glossary: {glossary_json} and {glossary_md}")
-    logging.info(f"Wrote glossary: {glossary_json} and {glossary_md}")
+    # Build glossary from all content
+    glossary_data = deduplicate_glossary(extracted_data)
+    summary_glossary_json = summary_dir / "summary_glossary.json"
+    summary_glossary_md = summary_dir / "summary_glossary.md"
 
-    # Example: If you ever generate per-topic summaries
-    # for topic in topics:
-    #     safe_topic = sanitize_filename(topic)
-    #     out_path = summary_dir / f"{safe_topic}_summary.json"
-    #     with open(out_path, "w") as f:
-    #         json.dump(data, f)
+    import json
+    with open(summary_glossary_json, "w") as f:
+        json.dump(glossary_data, f, indent=2)
+    write_markdown_glossary(glossary_data, summary_glossary_md)
+    print(f"Written glossary files: {summary_glossary_json} and {summary_glossary_md}")
 
-    print("Summarisation/Glossary batch complete.")
-    logging.info("Summarisation batch complete.")
+    logging.info(f"Summarisation complete. Files in {summary_dir}")
 
 if __name__ == "__main__":
     main()

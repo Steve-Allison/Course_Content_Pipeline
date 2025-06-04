@@ -1,14 +1,14 @@
 import logging
 import datetime
 from pathlib import Path
-from course_compiler.config import INPUT_ROOT, OUTPUT_ROOT
+from course_compiler.config import INPUT_ROOT, INSTRUCTIONAL_JSON_DIR, IMAGES_DIR, LOGS_DIR
 from course_compiler.file_utils import sanitize_filename, ensure_dirs
 from course_compiler.extractors import extract_content
 import json
 
 # Ensure output directory exists before logging!
-Path(OUTPUT_ROOT).mkdir(parents=True, exist_ok=True)
-logfile = Path(OUTPUT_ROOT) / f"prep_instructional_content_{datetime.datetime.now():%Y%m%d_%H%M%S}.log"
+Path(LOGS_DIR).mkdir(parents=True, exist_ok=True)
+logfile = Path(LOGS_DIR) / f"prep_instructional_content_{datetime.datetime.now():%Y%m%d_%H%M%S}.log"
 logging.basicConfig(
     filename=logfile,
     filemode="a",
@@ -24,13 +24,13 @@ def save_extraction_results(data, output_dir, output_filename):
     return output_path
 
 def main():
-    ensure_dirs(OUTPUT_ROOT, ["instructional_json"])
-    input_root = Path(INPUT_ROOT)
-    out_dir = Path(OUTPUT_ROOT) / "instructional_json"
+    # Ensure directories exist
+    Path(INSTRUCTIONAL_JSON_DIR).mkdir(parents=True, exist_ok=True)
+    Path(IMAGES_DIR).mkdir(parents=True, exist_ok=True)
 
-    # Create images subdirectory
-    images_dir = out_dir / "images"
-    images_dir.mkdir(parents=True, exist_ok=True)
+    input_root = Path(INPUT_ROOT)
+    out_dir = Path(INSTRUCTIONAL_JSON_DIR)
+    images_dir = Path(IMAGES_DIR)
 
     all_files = list(input_root.rglob("*"))
     supported_extensions = {'.pptx', '.ppt', '.docx', '.doc', '.pdf', '.xlsx', '.xlsm', '.xltx', '.xls', '.txt', '.md'}

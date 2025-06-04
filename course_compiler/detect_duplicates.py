@@ -14,11 +14,31 @@ def load_segments(output_dir):
             data = json.load(f)
         base = os.path.basename(path)
         if isinstance(data, dict) and "segments" in data:
-            for seg in data["segments"]:
-                segments.append((seg["id"], seg.get("text", ""), base))
+            for i, seg in enumerate(data["segments"]):
+                # Handle different types of segments
+                if isinstance(seg, dict):
+                    seg_id = seg.get("id", f"{base}_segment_{i}")
+                    text = seg.get("text", "")
+                elif isinstance(seg, str):
+                    seg_id = f"{base}_segment_{i}"
+                    text = seg
+                else:
+                    seg_id = f"{base}_segment_{i}"
+                    text = str(seg)
+                segments.append((seg_id, text, base))
         elif isinstance(data, list):
-            for seg in data:
-                segments.append((seg["id"], seg.get("text", ""), base))
+            for i, seg in enumerate(data):
+                # Handle different types of segments
+                if isinstance(seg, dict):
+                    seg_id = seg.get("id", f"{base}_segment_{i}")
+                    text = seg.get("text", "")
+                elif isinstance(seg, str):
+                    seg_id = f"{base}_segment_{i}"
+                    text = seg
+                else:
+                    seg_id = f"{base}_segment_{i}"
+                    text = str(seg)
+                segments.append((seg_id, text, base))
     return segments
 
 def detect_duplicates(segments, model_name, threshold):
@@ -44,6 +64,15 @@ def detect_duplicates(segments, model_name, threshold):
                     seen.add(pair)
     return results
 
+def safe_output_path(output_dir, filename):
+    """Create output path and ensure directory exists for relative paths."""
+    if "/" in filename:
+        output_path = os.path.join(output_dir, filename)
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    else:
+        output_path = os.path.join(output_dir, filename)
+    return output_path
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Detect near-duplicate segments across content.")
     parser.add_argument("--output_dir", default="output", help="Path to output folder")
@@ -55,9 +84,9 @@ if __name__ == "__main__":
     segments = load_segments(args.output_dir)
     duplicates = detect_duplicates(segments, args.model, args.threshold)
 
-    output_file = os.path.join(args.output_dir, args.output_file)
-    with open(output_file, "w", encoding="utf-8") as f:
+    output_path = safe_output_path(args.output_dir, args.output_file)
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(duplicates, f, indent=2)
 
     logger.info(f"Found {len(duplicates)} duplicate segment pairs.")
-    logger.info(f"Saved to {output_file}")
+    logger.info(f"Saved to {output_path}")

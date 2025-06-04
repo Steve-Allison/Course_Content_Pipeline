@@ -4,11 +4,11 @@ import sys
 import subprocess
 import os
 from pathlib import Path
-from course_compiler.config import OUTPUT_ROOT
+from course_compiler.config import ANALYSIS_DIR, GLOSSARY_DIR, PROMPTS_DIR, LOGS_DIR, SUMMARY_DIR
 
 # Set up logging
-Path(OUTPUT_ROOT).mkdir(parents=True, exist_ok=True)
-logfile = Path(OUTPUT_ROOT) / f"comprehensive_analysis_{datetime.datetime.now():%Y%m%d_%H%M%S}.log"
+Path(LOGS_DIR).mkdir(parents=True, exist_ok=True)
+logfile = Path(LOGS_DIR) / f"comprehensive_analysis_{datetime.datetime.now():%Y%m%d_%H%M%S}.log"
 logging.basicConfig(
     filename=logfile,
     filemode="a",
@@ -39,35 +39,56 @@ def main():
     print("=== Running Comprehensive Content Analysis ===")
     logging.info("Starting comprehensive analysis suite...")
 
-    # Get the course_compiler directory
+    # Get the course_compiler directory and scripts directory
     course_compiler_dir = Path(__file__).parent.parent / "course_compiler"
-    output_dir = OUTPUT_ROOT
+    scripts_dir = Path(__file__).parent
 
     # Define all analysis scripts with their configurations
     analysis_scripts = [
         {
             "script": course_compiler_dir / "analyze_segment_sources.py",
-            "args": ["--output_dir", output_dir],
+            "args": ["--output_dir", SUMMARY_DIR, "--output_file", "analysis/segment_counts_by_source.json"],
             "description": "Source Distribution Analysis"
         },
         {
             "script": course_compiler_dir / "analyze_segment_quality_and_topics.py",
-            "args": ["--output_dir", output_dir],
+            "args": [
+                "--output_dir", SUMMARY_DIR,
+                "--quality_file", "analysis/segment_quality_report.json",
+                "--topic_file", "analysis/topic_coverage_report.json",
+                "--warnings_file", "analysis/segment_quality_warnings.json"
+            ],
             "description": "Content Quality & Topic Analysis"
         },
         {
             "script": course_compiler_dir / "analyze_glossary_usage.py",
-            "args": ["--output_dir", output_dir],
+            "args": [
+                "--output_dir", SUMMARY_DIR,
+                "--usage_file", "glossary/term_usage.json",
+                "--unused_file", "glossary/unused_terms.json",
+                "--improvement_file", "glossary/improvement_prompts.txt",
+                "--ai_prompt_file", "glossary/ai_prompt_templates.txt"
+            ],
             "description": "Glossary Usage Analysis"
         },
         {
             "script": course_compiler_dir / "detect_duplicates.py",
-            "args": ["--output_dir", output_dir, "--threshold", "0.85"],
+            "args": ["--output_dir", SUMMARY_DIR, "--threshold", "0.85", "--output_file", "analysis/duplicate_segments.json"],
             "description": "Duplicate Content Detection"
         },
         {
+            "script": scripts_dir / "run_advanced_audio_analysis.py",
+            "args": [],
+            "description": "🎵 Advanced Audio Feature Analysis"
+        },
+        {
+            "script": scripts_dir / "run_enhanced_knowledge_extraction.py",
+            "args": [],
+            "description": "🧠 Enhanced Knowledge Extraction (Visual + Knowledge Graph)"
+        },
+        {
             "script": course_compiler_dir / "generate_output_manifest.py",
-            "args": ["--output_dir", output_dir],
+            "args": ["--output_dir", SUMMARY_DIR, "--bundle_name", "prompts/prompt_bundle.md"],
             "description": "Output Manifest Generation"
         }
     ]
@@ -75,7 +96,7 @@ def main():
     results = []
 
     print(f"Running {len(analysis_scripts)} analysis modules...")
-    print(f"Output directory: {output_dir}")
+    print(f"Summary directory: {SUMMARY_DIR}")
 
     for i, config in enumerate(analysis_scripts, 1):
         script = config["script"]
@@ -110,29 +131,63 @@ def main():
         status_icon = "✅" if success else "❌"
         print(f"  {status_icon} {desc}: {status}")
 
-    # List generated files
+    # List generated files in organized structure
     print(f"\n=== Generated Analysis Files ===")
+
+    # Analysis files
     analysis_files = [
-        "segment_counts_by_source.json",
-        "segment_quality_report.json",
-        "topic_coverage_report.json",
-        "segment_quality_warnings.json",
-        "glossary_term_usage.json",
-        "unused_glossary_terms.json",
-        "glossary_improvement_prompts.txt",
-        "glossary_ai_prompt_templates.txt",
-        "duplicate_segments.json",
-        "prompt_bundle.md"
+        "analysis/segment_counts_by_source.json",
+        "analysis/segment_quality_report.json",
+        "analysis/topic_coverage_report.json",
+        "analysis/segment_quality_warnings.json",
+        "analysis/duplicate_segments.json",
+        "analysis/audio_features/audio_analysis_summary.json",  # Advanced audio analysis
+        "analysis/visual_content/visual_insights_summary.json",  # NEW: Visual content analysis
+        "analysis/knowledge_graph/knowledge_graph.json",  # NEW: Knowledge graph
+        "analysis/enhanced_insights/enhanced_ai_insights.json"  # NEW: Enhanced AI insights
     ]
 
-    for filename in analysis_files:
-        filepath = Path(output_dir) / filename
+    # Glossary files
+    glossary_files = [
+        "glossary/term_usage.json",
+        "glossary/unused_terms.json",
+        "glossary/improvement_prompts.txt",
+        "glossary/ai_prompt_templates.txt"
+    ]
+
+    # Prompt files
+    prompt_files = [
+        "prompts/prompt_bundle.md",
+        "analysis/enhanced_insights/enhanced_ai_prompts.md"  # NEW: Enhanced AI prompts
+    ]
+
+    all_files = analysis_files + glossary_files + prompt_files
+
+    for filename in all_files:
+        filepath = Path(SUMMARY_DIR) / filename
         if filepath.exists():
             size_kb = filepath.stat().st_size / 1024
             print(f"  📄 {filename} ({size_kb:.1f} KB)")
 
+    # Special mention for enhanced analysis directories
+    enhanced_dirs = [
+        ("analysis/audio_features", "🎵 Advanced audio analysis"),
+        ("analysis/visual_content", "🔍 Visual content analysis"),
+        ("analysis/knowledge_graph", "🧠 Knowledge graph analysis"),
+        ("analysis/enhanced_insights", "🎯 Enhanced AI insights")
+    ]
+
+    for dir_path, description in enhanced_dirs:
+        full_dir_path = Path(SUMMARY_DIR) / dir_path
+        if full_dir_path.exists():
+            file_count = len(list(full_dir_path.rglob("*.json"))) + len(list(full_dir_path.rglob("*.md")))
+            if file_count > 0:
+                print(f"  {description}: {file_count} analysis files")
+
     logging.info(f"Comprehensive analysis complete: {successful}/{total} successful")
     print(f"\nDetailed logs: {logfile}")
+    print(f"🎯 All AI-ready files in: {SUMMARY_DIR}")
+    print(f"🚀 Enhanced knowledge extraction now includes visual analysis and knowledge graphs!")
 
 if __name__ == "__main__":
     main()

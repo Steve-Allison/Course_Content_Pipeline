@@ -34,7 +34,15 @@ def main():
     logger.info("Segment counts by source_tag:")
     for tag, count in counts.items():
         logger.info(f"{tag:15}: {count}")
-    output_path = os.path.join(args.output_dir, args.output_file)
+
+    # Handle relative output paths
+    if "/" in args.output_file:
+        output_path = os.path.join(args.output_dir, args.output_file)
+        # Ensure the subdirectory exists
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    else:
+        output_path = os.path.join(args.output_dir, args.output_file)
+
     with open(output_path, "w") as f:
         json.dump(counts, f, indent=2)
     logger.info("Saved source tag counts to %s", output_path)

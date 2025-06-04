@@ -7,8 +7,6 @@ from docx import Document as DocxDocument
 from docx.document import Document as DocumentType
 from docx.table import Table
 from docx.text.paragraph import Paragraph
-from docx.oxml.table import CT_Tbl
-from docx.oxml.text.paragraph import CT_P
 import io
 import os
 
@@ -70,16 +68,19 @@ class DocxExtractor(BaseExtractor):
                 }
                 content['sections'].append(section_data)
 
-            # Process all elements in the document
-            for element in self.document.element.body.iterchildren():
-                if isinstance(element, CT_P):  # Paragraph
-                    paragraph = self._process_paragraph(element)
-                    if paragraph:
-                        content['paragraphs'].append(paragraph)
-                elif isinstance(element, CT_Tbl):  # Table
-                    table = self._process_table(element)
-                    if table:
-                        content['tables'].append(table)
+            # Process all elements in the document using a safer approach
+            # Process paragraphs directly
+            for paragraph in self.document.paragraphs:
+                if paragraph.text.strip():
+                    para_data = self._process_paragraph_object(paragraph)
+                    if para_data:
+                        content['paragraphs'].append(para_data)
+
+            # Process tables directly
+            for table in self.document.tables:
+                table_data = self._process_table_object(table)
+                if table_data:
+                    content['tables'].append(table_data)
 
             # Extract images
             content['images'] = self._extract_images()
@@ -90,13 +91,9 @@ class DocxExtractor(BaseExtractor):
             logger.error(f"Error extracting content from {self.file_path}: {e}")
             raise ExtractionError(f"Failed to extract content: {e}") from e
 
-    def _process_paragraph(self, element: CT_P) -> Optional[Dict[str, Any]]:
-        """Process a single paragraph element."""
+    def _process_paragraph_object(self, paragraph: Paragraph) -> Optional[Dict[str, Any]]:
+        """Process a single paragraph object."""
         try:
-            paragraph = self.document.paragraphs[
-                self.document.paragraphs.index(element.paragraph)
-            ]
-
             if not paragraph.text.strip():
                 return None
 
@@ -119,15 +116,11 @@ class DocxExtractor(BaseExtractor):
             logger.warning(f"Failed to process paragraph: {e}")
             return None
 
-    def _process_table(self, element: CT_Tbl) -> Optional[Dict[str, Any]]:
-        """Process a table element."""
+    def _process_table_object(self, table: Table) -> Optional[Dict[str, Any]]:
+        """Process a table object."""
         try:
-            table = self.document.tables[
-                [t._tbl for t in self.document.tables].index(element)
-            ]
-
             rows = []
-            for i, row in enumerate(table.rows):
+            for row in table.rows:
                 row_data = []
                 for cell in row.cells:
                     cell_text = ' '.join(para.text for para in cell.paragraphs)

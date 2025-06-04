@@ -1,4 +1,7 @@
-from course_compiler.config import OUTPUT_ROOT
+from course_compiler.config import (
+    INSTRUCTIONAL_JSON_DIR, CAPTION_PREPPED_DIR, SUMMARY_DIR,
+    PROMPTS_DIR, ANALYSIS_DIR
+)
 from course_compiler.enrichment_meta import (
     group_segments_by_topic,
     print_tag_coverage,
@@ -33,13 +36,13 @@ def dir_exists_or_exit(path, description):
         sys.exit(1)
 
 def main():
-    instr_dir = f"{OUTPUT_ROOT}/instructional_json"
-    caption_dir = f"{OUTPUT_ROOT}/caption_prepped"
-    topics_summary = f"{OUTPUT_ROOT}/topics_summary.json"
-    entities_json = f"{OUTPUT_ROOT}/entities_summary.json"
-    outdir = f"{OUTPUT_ROOT}/prompt_topics"
-    out_csv = f"{OUTPUT_ROOT}/instructional_review.csv"
-    out_txt = f"{OUTPUT_ROOT}/concepts_needing_assessment.txt"
+    instr_dir = INSTRUCTIONAL_JSON_DIR
+    caption_dir = CAPTION_PREPPED_DIR
+    topics_summary = f"{SUMMARY_DIR}/topics_summary.json"
+    entities_json = f"{SUMMARY_DIR}/entities_summary.json"
+    outdir = PROMPTS_DIR
+    out_csv = f"{PROMPTS_DIR}/instructional_review.csv"
+    out_txt = f"{PROMPTS_DIR}/concepts_needing_assessment.txt"
 
     # Pre-flight checks for all required files and directories
     file_exists_or_exit(topics_summary, "Topics summary JSON (topics_summary.json)")

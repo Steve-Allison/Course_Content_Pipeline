@@ -1,11 +1,11 @@
-from course_compiler.config import OUTPUT_ROOT
+from course_compiler.config import INSTRUCTIONAL_JSON_DIR, GLOSSARY_DIR, TEMP_DIR
 from course_compiler.glossary_builder import build_glossary
 from pathlib import Path
 
 def main():
-    instr_dir = Path(OUTPUT_ROOT) / "instructional_json"
-    out_json = Path(OUTPUT_ROOT) / "glossary_for_definition.json"
-    out_csv = Path(OUTPUT_ROOT) / "glossary_for_definition.csv"
+    instr_dir = Path(INSTRUCTIONAL_JSON_DIR)
+    out_json = Path(GLOSSARY_DIR) / "glossary_for_definition.json"
+    out_csv = Path(GLOSSARY_DIR) / "glossary_for_definition.csv"
 
     # Create a simple input file from extracted content
     all_text = ""
@@ -31,7 +31,7 @@ def main():
                     all_text += extract_text(data)
 
     # Write all text to a temporary file for glossary building
-    temp_input = Path(OUTPUT_ROOT) / "temp_text_input.txt"
+    temp_input = Path(TEMP_DIR) / "temp_text_input.txt"
     with open(temp_input, "w") as f:
         f.write(all_text)
 

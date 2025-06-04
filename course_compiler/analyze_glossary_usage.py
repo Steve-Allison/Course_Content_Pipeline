@@ -40,6 +40,15 @@ def count_glossary_usage(segments, glossary_terms):
                 counter[term] += 1
     return counter
 
+def safe_output_path(output_dir, filename):
+    """Create output path and ensure directory exists for relative paths."""
+    if "/" in filename:
+        output_path = os.path.join(output_dir, filename)
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    else:
+        output_path = os.path.join(output_dir, filename)
+    return output_path
+
 def main():
     parser = argparse.ArgumentParser(description="Analyze glossary usage and suggest improvements.")
     parser.add_argument("--output_dir", default="output", help="Directory containing output files")
@@ -55,10 +64,16 @@ def main():
     usage_counts = count_glossary_usage(segments, glossary_terms)
     unused_terms = [term for term in glossary_terms if usage_counts.get(term, 0) == 0]
 
-    with open(os.path.join(args.output_dir, args.usage_file), "w", encoding="utf-8") as f:
+    # Write output files with proper path handling
+    usage_path = safe_output_path(args.output_dir, args.usage_file)
+    unused_path = safe_output_path(args.output_dir, args.unused_file)
+    improvement_path = safe_output_path(args.output_dir, args.improvement_file)
+    ai_prompt_path = safe_output_path(args.output_dir, args.ai_prompt_file)
+
+    with open(usage_path, "w", encoding="utf-8") as f:
         json.dump(dict(usage_counts), f, indent=2, ensure_ascii=False)
 
-    with open(os.path.join(args.output_dir, args.unused_file), "w", encoding="utf-8") as f:
+    with open(unused_path, "w", encoding="utf-8") as f:
         json.dump(unused_terms, f, indent=2, ensure_ascii=False)
 
     prompt_lines = []
@@ -69,7 +84,7 @@ def main():
         elif count < 3:
             prompt_lines.append(f"- Consider expanding usage/examples of: '{term}' (only mentioned {count} time{'s' if count != 1 else ''})")
 
-    with open(os.path.join(args.output_dir, args.improvement_file), "w", encoding="utf-8") as f:
+    with open(improvement_path, "w", encoding="utf-8") as f:
         f.write("\n".join(prompt_lines))
 
     ai_prompt_lines = []
@@ -80,7 +95,7 @@ def main():
         elif count < 3:
             ai_prompt_lines.append(f"'{term}' is used only {count} time(s). Suggest examples, analogies, or more usages to enhance its instructional value.")
 
-    with open(os.path.join(args.output_dir, args.ai_prompt_file), "w", encoding="utf-8") as f:
+    with open(ai_prompt_path, "w", encoding="utf-8") as f:
         f.write("\n".join(ai_prompt_lines))
 
     logger.info("Glossary usage written to %s", args.usage_file)

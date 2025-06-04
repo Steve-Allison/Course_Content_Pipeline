@@ -1,5 +1,3 @@
-
-
 import os
 import glob
 import json
@@ -74,6 +72,15 @@ def analyze_topic_coverage(json_files):
         "topic_frequency": Counter(all_topics)
     }
 
+def safe_output_path(output_dir, filename):
+    """Create output path and ensure directory exists for relative paths."""
+    if "/" in filename:
+        output_path = os.path.join(output_dir, filename)
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    else:
+        output_path = os.path.join(output_dir, filename)
+    return output_path
+
 def main():
     parser = argparse.ArgumentParser(description="Analyze segment quality and topic coverage.")
     parser.add_argument("--output_dir", default="output", help="Directory with content and caption JSON files.")
@@ -87,10 +94,15 @@ def main():
     quality_report = analyze_segment_quality(json_files)
     topic_report = analyze_topic_coverage(json_files)
 
-    with open(os.path.join(args.output_dir, args.quality_file), "w") as f:
+    # Write output files with proper path handling
+    quality_path = safe_output_path(args.output_dir, args.quality_file)
+    topic_path = safe_output_path(args.output_dir, args.topic_file)
+    warnings_path = safe_output_path(args.output_dir, args.warnings_file)
+
+    with open(quality_path, "w") as f:
         json.dump(quality_report, f, indent=2)
 
-    with open(os.path.join(args.output_dir, args.topic_file), "w") as f:
+    with open(topic_path, "w") as f:
         json.dump(topic_report, f, indent=2)
 
     logger.info("Wrote %s and %s", args.quality_file, args.topic_file)
@@ -115,7 +127,7 @@ def main():
     if exceeded:
         warnings.append(msg)
 
-    with open(os.path.join(args.output_dir, args.warnings_file), "w") as f:
+    with open(warnings_path, "w") as f:
         json.dump(warnings, f, indent=2)
 
     for w in warnings:

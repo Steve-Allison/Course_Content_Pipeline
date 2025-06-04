@@ -1,12 +1,15 @@
 import logging
 import datetime
 from pathlib import Path
-from course_compiler.config import OUTPUT_ROOT
+from course_compiler.config import (
+    INSTRUCTIONAL_JSON_DIR, CAPTION_PREPPED_DIR, MEDIA_METADATA_DIR,
+    SUMMARY_DIR, LOGS_DIR
+)
 from course_compiler.file_utils import sanitize_filename
 from course_compiler.aggregate_and_enrich import aggregate_all
 
-Path(OUTPUT_ROOT).mkdir(parents=True, exist_ok=True)
-logfile = Path(OUTPUT_ROOT) / f"run_aggregate_metadata_{datetime.datetime.now():%Y%m%d_%H%M%S}.log"
+Path(LOGS_DIR).mkdir(parents=True, exist_ok=True)
+logfile = Path(LOGS_DIR) / f"run_aggregate_metadata_{datetime.datetime.now():%Y%m%d_%H%M%S}.log"
 logging.basicConfig(
     filename=logfile,
     filemode="a",
@@ -15,12 +18,14 @@ logging.basicConfig(
 )
 
 def main():
-    instructional_json_dir = Path(OUTPUT_ROOT) / "instructional_json"
-    caption_prepped_dir = Path(OUTPUT_ROOT) / "caption_prepped"
-    media_metadata_dir = Path(OUTPUT_ROOT) / "media_metadata"
-    master_output = Path(OUTPUT_ROOT) / "master_summary.json"
-    entities_output = Path(OUTPUT_ROOT) / "entities_summary.json"
-    topics_output = Path(OUTPUT_ROOT) / "topics_summary.json"
+    instructional_json_dir = Path(INSTRUCTIONAL_JSON_DIR)
+    caption_prepped_dir = Path(CAPTION_PREPPED_DIR)
+    media_metadata_dir = Path(MEDIA_METADATA_DIR)
+
+    # Summary files go in the summary directory
+    master_output = Path(SUMMARY_DIR) / "master_summary.json"
+    entities_output = Path(SUMMARY_DIR) / "entities_summary.json"
+    topics_output = Path(SUMMARY_DIR) / "topics_summary.json"
 
     logging.info("Starting aggregation and enrichment.")
     try:
@@ -39,7 +44,7 @@ def main():
         # Example: If you generate any per-topic/entity outputs, sanitize those filenames:
         # for topic in result.get("topics", []):
         #     safe_topic = sanitize_filename(topic["name"])
-        #     out_path = Path(OUTPUT_ROOT) / f"topic_{safe_topic}.json"
+        #     out_path = Path(SUMMARY_DIR) / f"topic_{safe_topic}.json"
         #     with open(out_path, "w") as f:
         #         json.dump(topic, f)
 

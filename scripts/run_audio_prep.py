@@ -1,14 +1,15 @@
 import logging
 import datetime
 from pathlib import Path
-from course_compiler.config import INPUT_ROOT, OUTPUT_ROOT
+from course_compiler.config import INPUT_ROOT, AUDIO_PREPPED_DIR, LOGS_DIR
 from course_compiler.audio_prep import batch_video_processing
 from course_compiler.file_utils import ensure_dirs
 
 # Ensure output directory exists for logs and audio
-Path(OUTPUT_ROOT).mkdir(parents=True, exist_ok=True)
+Path(LOGS_DIR).mkdir(parents=True, exist_ok=True)
+Path(AUDIO_PREPPED_DIR).mkdir(parents=True, exist_ok=True)
 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-logfile = Path(OUTPUT_ROOT) / f"audio_prep_{timestamp}.log"
+logfile = Path(LOGS_DIR) / f"audio_prep_{timestamp}.log"
 logfile = Path(str(logfile).replace(" ", "_"))
 
 logging.basicConfig(
@@ -20,9 +21,8 @@ logging.basicConfig(
 
 def main():
     audio_input_folder = INPUT_ROOT
-    wav_output_folder = f"{OUTPUT_ROOT}/audio_prepped"
-    ensure_dirs(OUTPUT_ROOT, ["audio_prepped"])
-    log_file = Path(OUTPUT_ROOT) / f"audio_prep_batch_{timestamp}.log"
+    wav_output_folder = AUDIO_PREPPED_DIR
+    log_file = Path(LOGS_DIR) / f"audio_prep_batch_{timestamp}.log"
     log_file = Path(str(log_file).replace(" ", "_"))
 
     print(f"Preparing audio files from {audio_input_folder} to {wav_output_folder}")

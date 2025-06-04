@@ -202,10 +202,10 @@ class PdfExtractor(BaseExtractor):
             metadata = super().get_metadata()
             pdf_metadata = self.document.metadata
 
-            # Add PDF-specific metadata
+            # Add PDF-specific metadata with safe attribute access
             metadata.update({
-                'pdf_version': self.document.pdf_version,
-                'is_encrypted': self.document.is_encrypted,
+                'pdf_version': getattr(self.document, 'pdf_version', None),
+                'is_encrypted': getattr(self.document, 'is_encrypted', False),
                 'permissions': self._get_permissions(),
                 'title': pdf_metadata.get('title', ''),
                 'author': pdf_metadata.get('author', ''),
@@ -225,7 +225,7 @@ class PdfExtractor(BaseExtractor):
 
     def _get_permissions(self) -> Dict[str, bool]:
         """Get PDF permissions as a dictionary."""
-        if self.document is None or not hasattr(self.document, 'permissions'):
+        if self.document is None:
             return {}
 
         perms = {}
@@ -234,7 +234,16 @@ class PdfExtractor(BaseExtractor):
             'assemble', 'print_highres'
         ]
 
-        for perm in perm_names:
-            perms[perm] = bool(getattr(self.document, f'has_{perm}', lambda: False)())
+        try:
+            for perm in perm_names:
+                # Try multiple ways to access permissions
+                if hasattr(self.document, f'has_{perm}'):
+                    perms[perm] = getattr(self.document, f'has_{perm}', False)
+                elif hasattr(self.document, 'permissions') and hasattr(self.document.permissions, perm):
+                    perms[perm] = getattr(self.document.permissions, perm, False)
+                else:
+                    perms[perm] = False
+        except Exception as e:
+            logger.debug(f"Error getting permissions: {e}")
 
         return perms
